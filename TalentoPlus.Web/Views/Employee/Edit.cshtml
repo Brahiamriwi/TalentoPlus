@@ -34,8 +34,11 @@
                     
                     <div class="mb-3">
                         <label asp-for="DateOfBirth" class="form-label">Fecha de Nacimiento *</label>
-                        <input asp-for="DateOfBirth" type="date" class="form-control" required />
+                        <input asp-for="DateOfBirth" type="date" class="form-control" id="dateOfBirth" required />
                         <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                        <div id="dateOfBirthError" class="text-danger" style="display:none;">
+                            El empleado debe tener al menos 18 años de edad.
+                        </div>
                     </div>
                     
                     <div class="mb-3">
@@ -93,8 +96,11 @@
                     
                     <div class="mb-3">
                         <label asp-for="HireDate" class="form-label">Fecha de Ingreso *</label>
-                        <input asp-for="HireDate" type="date" class="form-control" required />
+                        <input asp-for="HireDate" type="date" class="form-control" id="hireDate" required />
                         <span asp-validation-for="HireDate" class="text-danger"></span>
+                        <div id="hireDateError" class="text-danger" style="display:none;">
+                            La fecha de ingreso no puede ser una fecha futura.
+                        </div>
                     </div>
                     
                     <div class="mb-3">
@@ -106,8 +112,9 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label asp-for="ProfessionalProfile" class="form-label">Perfil Profesional</label>
-                        <textarea asp-for="ProfessionalProfile" class="form-control" rows="4"></textarea>
+                        <label asp-for="ProfessionalProfile" class="form-label">Perfil Profesional <small class="text-muted">(máx. 100 caracteres)</small></label>
+                        <textarea asp-for="ProfessionalProfile" class="form-control" rows="4" maxlength="100" id="professionalProfile"></textarea>
+                        <div class="form-text"><span id="charCount">0</span>/100 caracteres</div>
                         <span asp-validation-for="ProfessionalProfile" class="text-danger"></span>
                     </div>
                 </div>
@@ -129,4 +136,86 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayStr = today.toISOString().split('T')[0];
+            
+            const dateOfBirthInput = document.getElementById('dateOfBirth');
+            const hireDateInput = document.getElementById('hireDate');
+            const professionalProfileInput = document.getElementById('professionalProfile');
+            const charCountSpan = document.getElementById('charCount');
+            const form = document.querySelector('form');
+
+            // Calculate max date of birth (must be at least 18 years old)
+            const maxDateOfBirth = new Date();
+            maxDateOfBirth.setFullYear(maxDateOfBirth.getFullYear() - 18);
+            const maxDateOfBirthStr = maxDateOfBirth.toISOString().split('T')[0];
+
+            // Initialize character counter
+            charCountSpan.textContent = professionalProfileInput.value.length;
+
+            // Character counter for professional profile
+            professionalProfileInput.addEventListener('input', function() {
+                charCountSpan.textContent = this.value.length;
+            });
+
+            // Real-time validation for date of birth
+            dateOfBirthInput.addEventListener('change', function() {
+                const dateOfBirthError = document.getElementById('dateOfBirthError');
+                if (this.value && this.value > maxDateOfBirthStr) {
+                    dateOfBirthError.style.display = 'block';
+                    this.classList.add('is-invalid');
+                } else {
+                    dateOfBirthError.style.display = 'none';
+                    this.classList.remove('is-invalid');
+                }
+            });
+
+            // Real-time validation for hire date
+            hireDateInput.addEventListener('change', function() {
+                const hireDateError = document.getElementById('hireDateError');
+                if (this.value && this.value > todayStr) {
+                    hireDateError.style.display = 'block';
+                    this.classList.add('is-invalid');
+                } else {
+                    hireDateError.style.display = 'none';
+                    this.classList.remove('is-invalid');
+                }
+            });
+
+            // Form validation on submit
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                const dateOfBirthError = document.getElementById('dateOfBirthError');
+                const hireDateError = document.getElementById('hireDateError');
+
+                // Validate date of birth (18+ years)
+                if (dateOfBirthInput.value > maxDateOfBirthStr) {
+                    dateOfBirthError.style.display = 'block';
+                    dateOfBirthInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    dateOfBirthError.style.display = 'none';
+                    dateOfBirthInput.classList.remove('is-invalid');
+                }
+
+                // Validate hire date (not in future)
+                if (hireDateInput.value > todayStr) {
+                    hireDateError.style.display = 'block';
+                    hireDateInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    hireDateError.style.display = 'none';
+                    hireDateInput.classList.remove('is-invalid');
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+        });
+    </script>
 }

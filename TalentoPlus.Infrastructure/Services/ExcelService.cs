@@ -32,9 +32,6 @@ public class ExcelService : IExcelService
         var rowCount = worksheet.Dimension?.Rows ?? 0;
         
         // Step 1: Extract unique department names from Excel
-        // Column mapping: 1=Documento, 2=Nombres, 3=Apellidos, 4=FechaNacimiento, 5=Direccion, 
-        // 6=Telefono, 7=Email, 8=Cargo, 9=Salario, 10=FechaIngreso, 11=Estado, 
-        // 12=NivelEducativo, 13=PerfilProfesional, 14=Departamento
         var departmentNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         for (int row = 2; row <= rowCount; row++)
         {
