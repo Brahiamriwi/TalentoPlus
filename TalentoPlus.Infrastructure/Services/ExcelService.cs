@@ -1,4 +1,6 @@
 using OfficeOpenXml;
+using System.Globalization;
+using System.Text;
 using TalentoPlus.Core.Entities;
 using TalentoPlus.Core.Enums;
 using TalentoPlus.Core.Interfaces;
@@ -29,46 +31,70 @@ public class ExcelService : IExcelService
 
         var rowCount = worksheet.Dimension?.Rows ?? 0;
         
-        // Start from row 2 (skip header)
+        // Step 1: Extract unique department names from Excel
+        // Column mapping: 1=Documento, 2=Nombres, 3=Apellidos, 4=FechaNacimiento, 5=Direccion, 
+        // 6=Telefono, 7=Email, 8=Cargo, 9=Salario, 10=FechaIngreso, 11=Estado, 
+        // 12=NivelEducativo, 13=PerfilProfesional, 14=Departamento
+        var departmentNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        for (int row = 2; row <= rowCount; row++)
+        {
+            var deptName = worksheet.Cells[row, 14].Text?.Trim(); // Departamento is column 14
+            if (!string.IsNullOrEmpty(deptName))
+                departmentNames.Add(deptName);
+        }
+
+        // Step 2: Ensure all departments exist in DB
+        foreach (var deptName in departmentNames)
+        {
+            var existing = await _departmentRepository.GetByNameAsync(deptName);
+            if (existing == null)
+            {
+                await _departmentRepository.CreateAsync(new Department { Name = deptName });
+            }
+        }
+
+        // Step 3: Reload all departments into cache
+        var allDepartments = await _departmentRepository.GetAllAsync();
+        var deptCache = allDepartments.ToDictionary(d => d.Name, d => d.Id, StringComparer.OrdinalIgnoreCase);
+
+        // Step 4: Import employees
         for (int row = 2; row <= rowCount; row++)
         {
             try
             {
-                var departmentName = worksheet.Cells[row, 13].Text?.Trim();
-                if (string.IsNullOrEmpty(departmentName))
+                var rawEmail = worksheet.Cells[row, 7].Text?.Trim(); // Email is column 7
+                if (string.IsNullOrEmpty(rawEmail))
                     continue;
 
-                // Find or create department
-                var department = await _departmentRepository.GetByNameAsync(departmentName);
-                if (department == null)
-                {
-                    department = await _departmentRepository.CreateAsync(new Department { Name = departmentName });
-                }
-
-                var email = worksheet.Cells[row, 6].Text?.Trim();
+                // Normalize email: remove accents and convert to lowercase
+                var email = NormalizeEmail(rawEmail);
                 if (string.IsNullOrEmpty(email))
                     continue;
 
-                // Check if employee already exists
                 var existingEmployee = await _employeeRepository.GetByEmailAsync(email);
                 if (existingEmployee != null)
                     continue;
 
+                var departmentName = worksheet.Cells[row, 14].Text?.Trim(); // Departamento is column 14
+                if (string.IsNullOrEmpty(departmentName) || !deptCache.TryGetValue(departmentName, out var deptId))
+                    continue;
+
                 var employee = new Employee
                 {
-                    FirstName = worksheet.Cells[row, 1].Text?.Trim() ?? string.Empty,
-                    LastName = worksheet.Cells[row, 2].Text?.Trim() ?? string.Empty,
-                    DateOfBirth = ParseDate(worksheet.Cells[row, 3].Text),
-                    Address = worksheet.Cells[row, 4].Text?.Trim() ?? string.Empty,
-                    Phone = worksheet.Cells[row, 5].Text?.Trim() ?? string.Empty,
-                    Email = email,
-                    Position = worksheet.Cells[row, 7].Text?.Trim() ?? string.Empty,
-                    Salary = ParseDecimal(worksheet.Cells[row, 8].Text),
-                    HireDate = ParseDate(worksheet.Cells[row, 9].Text),
-                    Status = ParseEnum<EmployeeStatus>(worksheet.Cells[row, 10].Text),
-                    EducationLevel = ParseEnum<EducationLevel>(worksheet.Cells[row, 11].Text),
-                    ProfessionalProfile = worksheet.Cells[row, 12].Text?.Trim() ?? string.Empty,
-                    DepartmentId = department.Id
+                    // Column 1 = Documento (not mapped - no field in Employee entity)
+                    FirstName = worksheet.Cells[row, 2].Text?.Trim() ?? string.Empty,      // Nombres
+                    LastName = worksheet.Cells[row, 3].Text?.Trim() ?? string.Empty,       // Apellidos
+                    DateOfBirth = ParseDate(worksheet.Cells[row, 4].Text),                 // FechaNacimiento
+                    Address = worksheet.Cells[row, 5].Text?.Trim() ?? string.Empty,        // Direccion
+                    Phone = worksheet.Cells[row, 6].Text?.Trim() ?? string.Empty,          // Telefono
+                    Email = email,                                                          // Email (column 7) - normalized
+                    Position = worksheet.Cells[row, 8].Text?.Trim() ?? string.Empty,       // Cargo
+                    Salary = ParseDecimal(worksheet.Cells[row, 9].Text),                   // Salario
+                    HireDate = ParseDate(worksheet.Cells[row, 10].Text),                   // FechaIngreso
+                    Status = ParseEmployeeStatus(worksheet.Cells[row, 11].Text),           // Estado
+                    EducationLevel = ParseEducationLevel(worksheet.Cells[row, 12].Text),   // NivelEducativo
+                    ProfessionalProfile = worksheet.Cells[row, 13].Text?.Trim() ?? string.Empty, // PerfilProfesional
+                    DepartmentId = deptId                                                  // Departamento (column 14)
                 };
 
                 await _employeeRepository.CreateAsync(employee);
@@ -76,7 +102,6 @@ public class ExcelService : IExcelService
             }
             catch
             {
-                // Skip rows with errors and continue with next row
                 continue;
             }
         }
@@ -87,16 +112,19 @@ public class ExcelService : IExcelService
     private static DateTime ParseDate(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return DateTime.MinValue;
+            return DateTime.UtcNow;
 
         if (DateTime.TryParse(value, out var date))
-            return date;
+            return DateTime.SpecifyKind(date, DateTimeKind.Utc);
 
         // Try parsing Excel numeric date
         if (double.TryParse(value, out var numericDate))
-            return DateTime.FromOADate(numericDate);
+        {
+            var parsedDate = DateTime.FromOADate(numericDate);
+            return DateTime.SpecifyKind(parsedDate, DateTimeKind.Utc);
+        }
 
-        return DateTime.MinValue;
+        return DateTime.UtcNow;
     }
 
     private static decimal ParseDecimal(string? value)
@@ -122,5 +150,63 @@ public class ExcelService : IExcelService
             return result;
 
         return default;
+    }
+
+    private static EmployeeStatus ParseEmployeeStatus(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return EmployeeStatus.Active;
+
+        return value.Trim().ToLower() switch
+        {
+            "activo" => EmployeeStatus.Active,
+            "inactivo" => EmployeeStatus.Inactive,
+            "vacaciones" => EmployeeStatus.OnVacation,
+            "en vacaciones" => EmployeeStatus.OnVacation,
+            _ => EmployeeStatus.Active
+        };
+    }
+
+    private static EducationLevel ParseEducationLevel(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return EducationLevel.HighSchool;
+
+        return value.Trim().ToLower() switch
+        {
+            "bachiller" => EducationLevel.HighSchool,
+            "técnico" or "tecnico" => EducationLevel.Technical,
+            "tecnólogo" or "tecnologo" => EducationLevel.Technologist,
+            "profesional" => EducationLevel.Bachelor,
+            "especialización" or "especializacion" => EducationLevel.Specialization,
+            "maestría" or "maestria" => EducationLevel.Master,
+            "doctorado" => EducationLevel.Doctorate,
+            _ => EducationLevel.HighSchool
+        };
+    }
+
+    private static string NormalizeEmail(string? email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return string.Empty;
+
+        // Remove accents and diacritics
+        var normalizedString = email.Normalize(NormalizationForm.FormD);
+        var stringBuilder = new StringBuilder();
+
+        foreach (var c in normalizedString)
+        {
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            {
+                stringBuilder.Append(c);
+            }
+        }
+
+        return stringBuilder
+            .ToString()
+            .Normalize(NormalizationForm.FormC)
+            .ToLowerInvariant()
+            .Trim();
     }
 }

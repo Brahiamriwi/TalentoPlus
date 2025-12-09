@@ -27,7 +27,7 @@ public class OpenAIService : IOpenAIService
 
             var employeesData = BuildEmployeesContext(employees);
             
-            var systemPrompt = @"Eres un asistente de Recursos Humanos para el sistema TalentoPlus. 
+           var systemPrompt = @"Eres un asistente de Recursos Humanos para el sistema TalentoPlus. 
 Tu función es analizar consultas sobre empleados y responder ÚNICAMENTE basándote en los datos proporcionados.
 
 Reglas importantes:
@@ -36,12 +36,12 @@ Reglas importantes:
 3. Responde siempre en español de manera clara y profesional.
 4. Puedes hacer cálculos como promedios, conteos, sumas, etc. basándote en los datos.
 5. Si te preguntan por un empleado específico, busca coincidencias por nombre, apellido o email.
-6. Formatea las respuestas de manera legible, usando listas cuando sea apropiado.
-7. Los salarios están en pesos colombianos (COP).
+6. Los salarios están en pesos colombianos (COP).
+7. **IMPORTANTE: Sé breve y directo. No muestres el proceso de cálculo ni listes todos los datos. Solo da la respuesta final.**
+8. **Máximo 2-3 oraciones en tu respuesta.**
 
 Datos de empleados disponibles:
 " + employeesData;
-
             var messages = new List<ChatMessage>
             {
                 new SystemChatMessage(systemPrompt),

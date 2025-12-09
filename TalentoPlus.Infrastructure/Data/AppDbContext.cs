@@ -37,7 +37,7 @@ public class AppDbContext : IdentityDbContext<IdentityUser>
                 .HasMaxLength(150);
             
             entity.Property(e => e.Phone)
-                .HasMaxLength(20);
+                .HasMaxLength(50);
             
             entity.Property(e => e.Address)
                 .HasMaxLength(250);
@@ -55,11 +55,11 @@ public class AppDbContext : IdentityDbContext<IdentityUser>
             // Enum to string conversion
             entity.Property(e => e.Status)
                 .HasConversion<string>()
-                .HasMaxLength(20);
+                .HasMaxLength(50);
             
             entity.Property(e => e.EducationLevel)
                 .HasConversion<string>()
-                .HasMaxLength(20);
+                .HasMaxLength(50);
             
             // Relationship with Department
             entity.HasOne(e => e.Department)
