@@ -1,0 +1,143 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-speedometer2 me-2"></i>Dashboard</h1>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1">Total Empleados</h6>
+                        <h2 class="mb-0 fw-bold">@ViewBag.TotalEmployees</h2>
+                    </div>
+                    <i class="bi bi-people-fill" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1">Activos</h6>
+                        <h2 class="mb-0 fw-bold">@ViewBag.ActiveEmployees</h2>
+                    </div>
+                    <i class="bi bi-person-check-fill" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1">En Vacaciones</h6>
+                        <h2 class="mb-0 fw-bold">@ViewBag.OnVacationEmployees</h2>
+                    </div>
+                    <i class="bi bi-sun-fill" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-secondary text-white shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1">Inactivos</h6>
+                        <h2 class="mb-0 fw-bold">@ViewBag.InactiveEmployees</h2>
+                    </div>
+                    <i class="bi bi-person-dash-fill" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Assistant -->
+<div class="card shadow">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">
+            <i class="bi bi-robot me-2 text-primary"></i>Asistente IA - Consultas en Lenguaje Natural
+        </h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            Pregunta lo que quieras sobre los empleados. Por ejemplo: 
+            <em>"¿Cuántos empleados hay en el departamento de Tecnología?"</em>, 
+            <em>"¿Cuál es el salario promedio?"</em>, 
+            <em>"Lista los empleados con maestría"</em>
+        </p>
+        <div class="input-group mb-3">
+            <input type="text" id="aiQuery" class="form-control form-control-lg" 
+                   placeholder="Escribe tu consulta aquí..." />
+            <button class="btn btn-primary btn-lg" type="button" id="askAiBtn">
+                <i class="bi bi-send me-1"></i>Preguntar
+            </button>
+        </div>
+        <div id="aiResponse" class="d-none">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="text-primary"><i class="bi bi-chat-dots me-2"></i>Respuesta:</h6>
+                    <div id="aiResponseText" class="mt-2" style="white-space: pre-wrap;"></div>
+                </div>
+            </div>
+        </div>
+        <div id="aiLoading" class="d-none text-center py-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Procesando...</span>
+            </div>
+            <p class="mt-2 text-muted">Procesando tu consulta...</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('askAiBtn').addEventListener('click', askAI);
+        document.getElementById('aiQuery').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') askAI();
+        });
+
+        async function askAI() {
+            const query = document.getElementById('aiQuery').value.trim();
+            if (!query) return;
+
+            const responseDiv = document.getElementById('aiResponse');
+            const responseText = document.getElementById('aiResponseText');
+            const loadingDiv = document.getElementById('aiLoading');
+
+            responseDiv.classList.add('d-none');
+            loadingDiv.classList.remove('d-none');
+
+            try {
+                const response = await fetch('@Url.Action("AskAI", "Dashboard")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const data = await response.json();
+                loadingDiv.classList.add('d-none');
+                responseDiv.classList.remove('d-none');
+                responseText.textContent = data.response;
+            } catch (error) {
+                loadingDiv.classList.add('d-none');
+                responseDiv.classList.remove('d-none');
+                responseText.textContent = 'Error al procesar la consulta. Intenta de nuevo.';
+            }
+        }
+    </script>
+    @Html.AntiForgeryToken()
+}

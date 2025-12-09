@@ -1,0 +1,64 @@
+@{
+    ViewData["Title"] = "Importar Empleados";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-file-earmark-excel me-2"></i>Importar Empleados desde Excel</h1>
+    <a asp-controller="Employee" asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Volver
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body">
+                <form asp-action="Import" method="post" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label for="file" class="form-label fw-bold">Seleccionar archivo Excel</label>
+                        <input type="file" class="form-control form-control-lg" id="file" name="file" 
+                               accept=".xlsx,.xls" required />
+                        <div class="form-text">
+                            Formatos permitidos: .xlsx, .xls
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="bi bi-upload me-2"></i>Importar Empleados
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow bg-light">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Formato del Excel</h5>
+            </div>
+            <div class="card-body">
+                <p class="small">El archivo Excel debe tener las siguientes columnas en orden:</p>
+                <ol class="small mb-0">
+                    <li>Nombres</li>
+                    <li>Apellidos</li>
+                    <li>FechaNacimiento</li>
+                    <li>Direccion</li>
+                    <li>Telefono</li>
+                    <li>Email</li>
+                    <li>Cargo</li>
+                    <li>Salario</li>
+                    <li>FechaIngreso</li>
+                    <li>Estado (Active/Inactive/OnVacation)</li>
+                    <li>NivelEducativo (HighSchool/Technical/...)</li>
+                    <li>PerfilProfesional</li>
+                    <li>Departamento</li>
+                </ol>
+                <hr/>
+                <p class="small text-muted mb-0">
+                    <i class="bi bi-lightbulb me-1"></i>
+                    La primera fila se considera encabezado y será ignorada.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
