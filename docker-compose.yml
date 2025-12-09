@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: talentoplus-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-TalentoPlusDb}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-TalentoPlusDb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: TalentoPlus.Web/Dockerfile
+    container_name: talentoplus-web
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB:-TalentoPlusDb};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}
+      - OpenAI__ApiKey=${OPENAI_API_KEY}
+      - Smtp__Host=${SMTP_HOST}
+      - Smtp__Port=${SMTP_PORT}
+      - Smtp__Username=${SMTP_USERNAME}
+      - Smtp__Password=${SMTP_PASSWORD}
+      - Smtp__FromEmail=${SMTP_FROM_EMAIL}
+      - Smtp__FromName=${SMTP_FROM_NAME}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    build:
+      context: .
+      dockerfile: TalentoPlus.API/Dockerfile
+    container_name: talentoplus-api
+    restart: unless-stopped
+    ports:
+      - "5002:5002"
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB:-TalentoPlusDb};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}
+      - OpenAI__ApiKey=${OPENAI_API_KEY}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER:-TalentoPlusAPI}
+      - Jwt__Audience=${JWT_AUDIENCE:-TalentoPlusUsers}
+      - Smtp__Host=${SMTP_HOST}
+      - Smtp__Port=${SMTP_PORT}
+      - Smtp__Username=${SMTP_USERNAME}
+      - Smtp__Password=${SMTP_PASSWORD}
+      - Smtp__FromEmail=${SMTP_FROM_EMAIL}
+      - Smtp__FromName=${SMTP_FROM_NAME}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
