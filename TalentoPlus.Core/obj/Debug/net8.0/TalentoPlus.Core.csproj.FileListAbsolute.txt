@@ -1,0 +1,12 @@
+C:\Users\Brahiam\Documents\TalentoPlus\TalentoPlus.Core\bin\Debug\net8.0\TalentoPlus.Core.deps.json
+C:\Users\Brahiam\Documents\TalentoPlus\TalentoPlus.Core\bin\Debug\net8.0\TalentoPlus.Core.dll
+C:\Users\Brahiam\Documents\TalentoPlus\TalentoPlus.Core\bin\Debug\net8.0\TalentoPlus.Core.pdb
+C:\Users\Brahiam\Documents\TalentoPlus\TalentoPlus.Core\obj\Debug\net8.0\TalentoPlus.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Brahiam\Documents\TalentoPlus\TalentoPlus.Core\obj\Debug\net8.0\TalentoPlus.Core.AssemblyInfoInputs.cache
+C:\Users\Brahiam\Documents\TalentoPlus\TalentoPlus.Core\obj\Debug\net8.0\TalentoPlus.Core.AssemblyInfo.cs
+C:\Users\Brahiam\Documents\TalentoPlus\TalentoPlus.Core\obj\Debug\net8.0\TalentoPlus.Core.csproj.CoreCompileInputs.cache
+C:\Users\Brahiam\Documents\TalentoPlus\TalentoPlus.Core\obj\Debug\net8.0\TalentoPlus.Core.sourcelink.json
+C:\Users\Brahiam\Documents\TalentoPlus\TalentoPlus.Core\obj\Debug\net8.0\TalentoPlus.Core.dll
+C:\Users\Brahiam\Documents\TalentoPlus\TalentoPlus.Core\obj\Debug\net8.0\refint\TalentoPlus.Core.dll
+C:\Users\Brahiam\Documents\TalentoPlus\TalentoPlus.Core\obj\Debug\net8.0\TalentoPlus.Core.pdb
+C:\Users\Brahiam\Documents\TalentoPlus\TalentoPlus.Core\obj\Debug\net8.0\ref\TalentoPlus.Core.dll

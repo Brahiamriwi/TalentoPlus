@@ -107,25 +107,37 @@
           "dependencies": {
             "EPPlus": {
               "target": "Package",
-              "version": "[8.3.1, )"
+              "version": "[7.5.2, )"
             },
             "MailKit": {
               "target": "Package",
-              "version": "[4.14.1, )"
+              "version": "[4.9.0, )"
+            },
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.11, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.11, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[10.0.1, )"
+              "version": "[8.0.11, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[8.0.11, )"
             },
             "OpenAI": {
               "target": "Package",
-              "version": "[2.7.0, )"
+              "version": "[2.1.0, )"
             },
             "QuestPDF": {
               "target": "Package",
-              "version": "[2025.7.4, )"
+              "version": "[2024.12.2, )"
             }
           },
           "imports": [
