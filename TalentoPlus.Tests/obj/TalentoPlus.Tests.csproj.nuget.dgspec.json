@@ -4,6 +4,88 @@
     "C:\\Users\\Brahiam\\Documents\\TalentoPlus\\TalentoPlus.Tests\\TalentoPlus.Tests.csproj": {}
   },
   "projects": {
+    "C:\\Users\\Brahiam\\Documents\\TalentoPlus\\TalentoPlus.API\\TalentoPlus.API.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Brahiam\\Documents\\TalentoPlus\\TalentoPlus.API\\TalentoPlus.API.csproj",
+        "projectName": "TalentoPlus.API",
+        "projectPath": "C:\\Users\\Brahiam\\Documents\\TalentoPlus\\TalentoPlus.API\\TalentoPlus.API.csproj",
+        "packagesPath": "C:\\Users\\Brahiam\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Brahiam\\Documents\\TalentoPlus\\TalentoPlus.API\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Brahiam\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "C:\\Users\\Brahiam\\Documents\\TalentoPlus\\TalentoPlus.Core\\TalentoPlus.Core.csproj": {
+                "projectPath": "C:\\Users\\Brahiam\\Documents\\TalentoPlus\\TalentoPlus.Core\\TalentoPlus.Core.csproj"
+              },
+              "C:\\Users\\Brahiam\\Documents\\TalentoPlus\\TalentoPlus.Infrastructure\\TalentoPlus.Infrastructure.csproj": {
+                "projectPath": "C:\\Users\\Brahiam\\Documents\\TalentoPlus\\TalentoPlus.Infrastructure\\TalentoPlus.Infrastructure.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.11, )"
+            },
+            "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[8.0.11, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.6.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.416/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
     "C:\\Users\\Brahiam\\Documents\\TalentoPlus\\TalentoPlus.Core\\TalentoPlus.Core.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -107,25 +189,37 @@
           "dependencies": {
             "EPPlus": {
               "target": "Package",
-              "version": "[8.3.1, )"
+              "version": "[7.5.2, )"
             },
             "MailKit": {
               "target": "Package",
-              "version": "[4.14.1, )"
+              "version": "[4.9.0, )"
+            },
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.11, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.11, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[10.0.1, )"
+              "version": "[8.0.11, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[8.0.11, )"
             },
             "OpenAI": {
               "target": "Package",
-              "version": "[2.7.0, )"
+              "version": "[2.1.0, )"
             },
             "QuestPDF": {
               "target": "Package",
-              "version": "[2025.7.4, )"
+              "version": "[2024.12.2, )"
             }
           },
           "imports": [
@@ -170,6 +264,9 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
+              "C:\\Users\\Brahiam\\Documents\\TalentoPlus\\TalentoPlus.API\\TalentoPlus.API.csproj": {
+                "projectPath": "C:\\Users\\Brahiam\\Documents\\TalentoPlus\\TalentoPlus.API\\TalentoPlus.API.csproj"
+              },
               "C:\\Users\\Brahiam\\Documents\\TalentoPlus\\TalentoPlus.Core\\TalentoPlus.Core.csproj": {
                 "projectPath": "C:\\Users\\Brahiam\\Documents\\TalentoPlus\\TalentoPlus.Core\\TalentoPlus.Core.csproj"
               },
@@ -195,6 +292,10 @@
           "targetAlias": "net8.0",
           "dependencies": {
             "Microsoft.AspNetCore.Mvc.Testing": {
+              "target": "Package",
+              "version": "[8.0.11, )"
+            },
+            "Microsoft.EntityFrameworkCore.InMemory": {
               "target": "Package",
               "version": "[8.0.11, )"
             },
