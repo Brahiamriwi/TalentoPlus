@@ -1,0 +1,35 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.dll
+*.pdb
+
+# IDE
+.vs/
+.vscode/
+*.swp
+
+# User-specific files
+appsettings.Development.json
+appsettings.Local.json
+*.local.json
+
+# Secrets
+secrets.json
+.env
+*.env
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test results
+TestResults/
+coverage/
