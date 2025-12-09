@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TalentoPlus.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+60973501b5ecd7dc42212f0b477aabf648e7078a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+13c2af7c731a11f45819398699bd072c2b619235")]
 [assembly: System.Reflection.AssemblyProductAttribute("TalentoPlus.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TalentoPlus.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
