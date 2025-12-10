@@ -61,19 +61,12 @@ using (var scope = app.Services.CreateScope())
         var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-        // Create Admin role if it doesn't exist
         if (!await roleManager.RoleExistsAsync("Admin"))
-        {
             await roleManager.CreateAsync(new IdentityRole("Admin"));
-        }
 
-        // Create Employee role if it doesn't exist
         if (!await roleManager.RoleExistsAsync("Employee"))
-        {
             await roleManager.CreateAsync(new IdentityRole("Employee"));
-        }
 
-        // Create admin user if it doesn't exist
         var adminEmail = "admin@talentoplus.com";
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
         if (adminUser == null)

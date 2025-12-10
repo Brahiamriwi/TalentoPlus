@@ -30,7 +30,6 @@ public class EmployeeController : Controller
         var allEmployees = await _employeeRepository.GetAllAsync();
         var query = allEmployees.AsQueryable();
 
-        // Aplicar filtros
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             var term = searchTerm.ToLower();
@@ -52,10 +51,8 @@ public class EmployeeController : Controller
             query = query.Where(e => e.Status == status.Value);
         }
 
-        // Contar total antes de paginar
         var totalItems = query.Count();
 
-        // Aplicar paginación
         var employees = query
             .OrderBy(e => e.FirstName)
             .ThenBy(e => e.LastName)
@@ -99,7 +96,6 @@ public class EmployeeController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Employee employee, string? otherDepartmentName)
     {
-        // Handle "Other" department option FIRST before validation
         if (employee.DepartmentId == -1)
         {
             if (!string.IsNullOrWhiteSpace(otherDepartmentName))
@@ -107,7 +103,6 @@ public class EmployeeController : Controller
                 var newDepartment = new Department { Name = otherDepartmentName.Trim() };
                 await _departmentRepository.CreateAsync(newDepartment);
                 employee.DepartmentId = newDepartment.Id;
-                // Remove the validation error for DepartmentId since we just set it
                 ModelState.Remove("DepartmentId");
             }
             else
@@ -116,31 +111,22 @@ public class EmployeeController : Controller
             }
         }
 
-        // Server-side validation for date of birth (must be 18+)
         var age = DateTime.Today.Year - employee.DateOfBirth.Year;
         if (employee.DateOfBirth > DateTime.Today.AddYears(-age)) age--;
         
         if (age < 18)
-        {
             ModelState.AddModelError("DateOfBirth", "El empleado debe tener al menos 18 años de edad.");
-        }
 
-        // Server-side validation for hire date (cannot be future)
         if (employee.HireDate.Date > DateTime.Today)
-        {
             ModelState.AddModelError("HireDate", "La fecha de ingreso no puede ser una fecha futura.");
-        }
 
-        // Remove Department navigation property validation error if exists
         ModelState.Remove("Department");
 
         if (ModelState.IsValid)
         {
-            // Check for duplicate email
             var allEmployees = await _employeeRepository.GetAllAsync();
-            var existingEmail = allEmployees.FirstOrDefault(e => 
-                e.Email.ToLower() == employee.Email.ToLower());
             
+            var existingEmail = allEmployees.FirstOrDefault(e => e.Email.ToLower() == employee.Email.ToLower());
             if (existingEmail != null)
             {
                 ModelState.AddModelError("Email", "Ya existe un empleado con este correo electrónico.");
@@ -148,10 +134,7 @@ public class EmployeeController : Controller
                 return View(employee);
             }
 
-            // Check for duplicate document
-            var existingDocument = allEmployees.FirstOrDefault(e => 
-                e.Document == employee.Document);
-            
+            var existingDocument = allEmployees.FirstOrDefault(e => e.Document == employee.Document);
             if (existingDocument != null)
             {
                 ModelState.AddModelError("Document", "Ya existe un empleado con este documento de identidad.");
@@ -159,7 +142,6 @@ public class EmployeeController : Controller
                 return View(employee);
             }
 
-            // Ensure dates are UTC for PostgreSQL
             employee.DateOfBirth = DateTime.SpecifyKind(employee.DateOfBirth, DateTimeKind.Utc);
             employee.HireDate = DateTime.SpecifyKind(employee.HireDate, DateTimeKind.Utc);
             
@@ -189,31 +171,22 @@ public class EmployeeController : Controller
         if (id != employee.Id)
             return NotFound();
 
-        // Remove Department navigation property validation error if exists
         ModelState.Remove("Department");
 
-        // Server-side validation for date of birth (must be 18+)
         var age = DateTime.Today.Year - employee.DateOfBirth.Year;
         if (employee.DateOfBirth > DateTime.Today.AddYears(-age)) age--;
         
         if (age < 18)
-        {
             ModelState.AddModelError("DateOfBirth", "El empleado debe tener al menos 18 años de edad.");
-        }
 
-        // Server-side validation for hire date (cannot be future)
         if (employee.HireDate.Date > DateTime.Today)
-        {
             ModelState.AddModelError("HireDate", "La fecha de ingreso no puede ser una fecha futura.");
-        }
 
         if (ModelState.IsValid)
         {
-            // Check for duplicate email (excluding current employee)
             var allEmployees = await _employeeRepository.GetAllAsync();
-            var existingEmail = allEmployees.FirstOrDefault(e => 
-                e.Email.ToLower() == employee.Email.ToLower() && e.Id != employee.Id);
             
+            var existingEmail = allEmployees.FirstOrDefault(e => e.Email.ToLower() == employee.Email.ToLower() && e.Id != employee.Id);
             if (existingEmail != null)
             {
                 ModelState.AddModelError("Email", "Ya existe otro empleado con este correo electrónico.");
@@ -221,10 +194,7 @@ public class EmployeeController : Controller
                 return View(employee);
             }
 
-            // Check for duplicate document (excluding current employee)
-            var existingDocument = allEmployees.FirstOrDefault(e => 
-                e.Document == employee.Document && e.Id != employee.Id);
-            
+            var existingDocument = allEmployees.FirstOrDefault(e => e.Document == employee.Document && e.Id != employee.Id);
             if (existingDocument != null)
             {
                 ModelState.AddModelError("Document", "Ya existe otro empleado con este documento de identidad.");
@@ -232,7 +202,6 @@ public class EmployeeController : Controller
                 return View(employee);
             }
 
-            // Ensure dates are UTC for PostgreSQL
             employee.DateOfBirth = DateTime.SpecifyKind(employee.DateOfBirth, DateTimeKind.Utc);
             employee.HireDate = DateTime.SpecifyKind(employee.HireDate, DateTimeKind.Utc);
             

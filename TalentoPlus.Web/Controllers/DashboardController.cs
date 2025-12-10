@@ -40,8 +40,8 @@ public class DashboardController : Controller
 
         try
         {
-            var employees = (await _employeeRepository.GetAllAsync()).ToList();
-            var response = await _openAIService.ProcessNaturalLanguageQueryAsync(request.Query, employees);
+            var employees = await _employeeRepository.GetAllAsync();
+            var response = await _openAIService.ProcessQueryAsync(request.Query, employees);
             return Json(new { success = true, response });
         }
         catch (Exception ex)
