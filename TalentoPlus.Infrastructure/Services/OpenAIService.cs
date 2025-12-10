@@ -16,7 +16,7 @@ public class OpenAIService : IOpenAIService
         _apiKey = configuration["OpenAI:ApiKey"] ?? string.Empty;
     }
 
-    public async Task<string> ProcessNaturalLanguageQueryAsync(string query, List<Employee> employees)
+    public async Task<string> ProcessQueryAsync(string query, IEnumerable<Employee> employees)
     {
         if (string.IsNullOrEmpty(_apiKey))
             return "Error: La API Key de OpenAI no está configurada.";
@@ -58,16 +58,17 @@ Datos de empleados disponibles:
         }
     }
 
-    private static string BuildEmployeesContext(List<Employee> employees)
+    private static string BuildEmployeesContext(IEnumerable<Employee> employees)
     {
-        if (employees == null || employees.Count == 0)
+        var employeeList = employees.ToList();
+        if (employeeList.Count == 0)
             return "No hay empleados registrados en el sistema.";
 
         var sb = new StringBuilder();
-        sb.AppendLine($"Total de empleados: {employees.Count}");
+        sb.AppendLine($"Total de empleados: {employeeList.Count}");
         sb.AppendLine();
 
-        foreach (var emp in employees)
+        foreach (var emp in employeeList)
         {
             sb.AppendLine($"- Nombre: {emp.FirstName} {emp.LastName}");
             sb.AppendLine($"  Email: {emp.Email}");
