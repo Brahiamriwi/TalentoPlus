@@ -86,13 +86,13 @@
                     <thead class="table-light">
                         <tr>
                             <th>Documento</th>
-                            <th>Nombre Completo</th>
+                            <th>Nombre</th>
                             <th>Email</th>
                             <th>Cargo</th>
                             <th>Departamento</th>
                             <th>Estado</th>
                             <th>Salario</th>
-                            <th class="text-center">Acciones</th>
+                            <th class="text-center col-actions">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -100,9 +100,7 @@
                         {
                             <tr>
                                 <td>@employee.Document</td>
-                                <td>
-                                    <strong>@employee.FirstName @employee.LastName</strong>
-                                </td>
+                                <td><strong>@employee.FirstName @employee.LastName</strong></td>
                                 <td>@employee.Email</td>
                                 <td>@employee.Position</td>
                                 <td>
@@ -128,7 +126,7 @@
                                     <span class="badge @statusClass">@statusText</span>
                                 </td>
                                 <td>$@employee.Salary.ToString("N0")</td>
-                                <td class="text-center">
+                                <td class="text-center col-actions">
                                     <div class="btn-group btn-group-sm">
                                         <a asp-action="Details" asp-route-id="@employee.Id" class="btn btn-outline-info" title="Ver detalles">
                                             <i class="bi bi-eye"></i>
