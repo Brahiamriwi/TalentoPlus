@@ -17,6 +17,7 @@ public class EmployeeRepository : IEmployeeRepository
     public async Task<IEnumerable<Employee>> GetAllAsync()
     {
         return await _context.Employees
+            .AsNoTracking()
             .Include(e => e.Department)
             .ToListAsync();
     }
@@ -31,6 +32,7 @@ public class EmployeeRepository : IEmployeeRepository
     public async Task<Employee?> GetByEmailAsync(string email)
     {
         return await _context.Employees
+            .AsNoTracking()
             .Include(e => e.Department)
             .FirstOrDefaultAsync(e => e.Email == email);
     }
@@ -51,6 +53,15 @@ public class EmployeeRepository : IEmployeeRepository
 
     public async Task<Employee> UpdateAsync(Employee employee)
     {
+        // Detach any existing tracked entity with the same Id
+        var existingEntry = _context.ChangeTracker.Entries<Employee>()
+            .FirstOrDefault(e => e.Entity.Id == employee.Id);
+        
+        if (existingEntry != null)
+        {
+            existingEntry.State = EntityState.Detached;
+        }
+
         _context.Employees.Update(employee);
         await _context.SaveChangesAsync();
         return employee;
