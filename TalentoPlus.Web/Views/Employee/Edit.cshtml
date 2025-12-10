@@ -21,6 +21,12 @@
                     <h5 class="text-primary mb-3"><i class="bi bi-person me-2"></i>Información Personal</h5>
                     
                     <div class="mb-3">
+                        <label asp-for="Document" class="form-label">Documento de Identidad *</label>
+                        <input asp-for="Document" class="form-control" required />
+                        <span asp-validation-for="Document" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="mb-3">
                         <label asp-for="FirstName" class="form-label">Nombres *</label>
                         <input asp-for="FirstName" class="form-control" required />
                         <span asp-validation-for="FirstName" class="text-danger"></span>
