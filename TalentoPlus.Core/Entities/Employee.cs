@@ -5,7 +5,7 @@ namespace TalentoPlus.Core.Entities;
 public class Employee
 {
     public int Id { get; set; }
-    public string Document { get; set; } = string.Empty; // Número de documento/identificación
+    public string Document { get; set; } = string.Empty;
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public DateTime DateOfBirth { get; set; }
@@ -22,6 +22,5 @@ public class Employee
     public int DepartmentId { get; set; }
     public Department Department { get; set; } = null!;
     
-    // For Identity - links employee with user account
     public string? UserId { get; set; }
 }
