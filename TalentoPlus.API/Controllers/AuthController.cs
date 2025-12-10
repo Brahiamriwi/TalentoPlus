@@ -18,22 +18,26 @@ public class AuthController : ControllerBase
     private readonly UserManager<IdentityUser> _userManager;
     private readonly IEmployeeRepository _employeeRepository;
     private readonly IDepartmentRepository _departmentRepository;
+    private readonly IEmailService _emailService;
     private readonly IConfiguration _configuration;
 
     public AuthController(
         UserManager<IdentityUser> userManager,
         IEmployeeRepository employeeRepository,
         IDepartmentRepository departmentRepository,
+        IEmailService emailService,
         IConfiguration configuration)
     {
         _userManager = userManager;
         _employeeRepository = employeeRepository;
         _departmentRepository = departmentRepository;
+        _emailService = emailService;
         _configuration = configuration;
     }
 
     /// <summary>
-    /// Registra un nuevo empleado y crea su cuenta de usuario
+    /// Autoregistro de empleado. Si el empleado ya existe (importado desde Excel),
+    /// solo crea las credenciales de acceso. Si no existe, crea empleado nuevo.
     /// </summary>
     [HttpPost("register")]
     public async Task<ActionResult<AuthResponseDto>> Register([FromBody] RegisterRequestDto request)
@@ -43,27 +47,63 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        // Check if email already exists
+        // Check if Identity user already exists
         var existingUser = await _userManager.FindByEmailAsync(request.Email);
         if (existingUser != null)
         {
-            return BadRequest(new { message = "El email ya está registrado" });
+            return BadRequest(new { message = "Ya tienes una cuenta creada. Por favor, inicia sesión." });
         }
 
-        // Validate department exists
-        var department = await _departmentRepository.GetByIdAsync(request.DepartmentId);
-        if (department == null)
+        var employees = await _employeeRepository.GetAllAsync();
+        var existingEmployee = employees.FirstOrDefault(e => 
+            e.Document == request.Document || 
+            e.Email.ToLower() == request.Email.ToLower());
+
+        Employee employee;
+        string mensaje;
+
+        if (existingEmployee != null)
         {
-            return BadRequest(new { message = "El departamento especificado no existe" });
-        }
+        
+            if (!string.IsNullOrEmpty(existingEmployee.UserId))
+            {
+                return BadRequest(new { message = "Este empleado ya tiene una cuenta de acceso creada. Por favor, inicia sesión." });
+            }
 
-        // Parse education level
-        if (!Enum.TryParse<EducationLevel>(request.EducationLevel, true, out var educationLevel))
+            employee = existingEmployee;
+            mensaje = "¡Bienvenido! Hemos vinculado tu cuenta con tu registro de empleado existente.";
+        }
+        else
         {
-            return BadRequest(new { message = "Nivel educativo no válido. Valores permitidos: HighSchool, Technical, Bachelor, Master, Doctorate" });
+    
+            var department = await _departmentRepository.GetByIdAsync(request.DepartmentId);
+            if (department == null)
+            {
+                return BadRequest(new { message = "El departamento especificado no existe" });
+            }
+
+            employee = new Employee
+            {
+                Document = request.Document,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email,
+                Phone = request.Phone,
+                DateOfBirth = DateTime.SpecifyKind(DateTime.Today.AddYears(-25), DateTimeKind.Utc),
+                Address = "Pendiente de actualización",
+                Position = "Pendiente de asignación",
+                Salary = 0,
+                HireDate = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc),
+                Status = EmployeeStatus.Inactive,
+                EducationLevel = EducationLevel.HighSchool,
+                ProfessionalProfile = "Pendiente de actualización",
+                DepartmentId = request.DepartmentId
+            };
+
+            await _employeeRepository.CreateAsync(employee);
+            mensaje = "Registro exitoso. Tu cuenta está pendiente de activación por RRHH.";
         }
 
-        // Create Identity user
         var user = new IdentityUser
         {
             UserName = request.Email,
@@ -77,31 +117,26 @@ public class AuthController : ControllerBase
             return BadRequest(new { message = "Error al crear el usuario", errors = createResult.Errors.Select(e => e.Description) });
         }
 
-        // Assign Employee role
         await _userManager.AddToRoleAsync(user, "Employee");
 
-        // Create employee record
-        var employee = new Employee
+    
+        employee.UserId = user.Id;
+        
+        if (existingEmployee != null)
         {
-            FirstName = request.FirstName,
-            LastName = request.LastName,
-            DateOfBirth = DateTime.SpecifyKind(request.DateOfBirth, DateTimeKind.Utc),
-            Address = request.Address,
-            Phone = request.Phone,
-            Email = request.Email,
-            Position = request.Position,
-            Salary = request.Salary,
-            HireDate = DateTime.SpecifyKind(request.HireDate, DateTimeKind.Utc),
-            Status = EmployeeStatus.Active,
-            EducationLevel = educationLevel,
-            ProfessionalProfile = request.ProfessionalProfile,
-            DepartmentId = request.DepartmentId,
-            UserId = user.Id
-        };
+    
+            if (!string.IsNullOrEmpty(request.Phone) && request.Phone != employee.Phone)
+            {
+                employee.Phone = request.Phone;
+            }
+        }
+        
+        await _employeeRepository.UpdateAsync(employee);
 
-        await _employeeRepository.CreateAsync(employee);
+        var fullName = $"{employee.FirstName} {employee.LastName}";
+        var emailSent = await _emailService.SendWelcomeEmailAsync(request.Email, fullName);
 
-        // Generate JWT token
+    
         var token = GenerateJwtToken(user, employee);
 
         return Ok(new AuthResponseDto
@@ -109,12 +144,15 @@ public class AuthController : ControllerBase
             Token = token,
             Expiration = DateTime.UtcNow.AddHours(24),
             Email = user.Email!,
-            FullName = $"{employee.FirstName} {employee.LastName}"
+            FullName = fullName,
+            Message = emailSent 
+                ? $"{mensaje} Se ha enviado un correo de bienvenida."
+                : $"{mensaje} No se pudo enviar el correo de bienvenida."
         });
     }
 
     /// <summary>
-    /// Inicia sesión y devuelve un token JWT
+    /// Login de empleado. Devuelve token JWT si las credenciales son válidas.
     /// </summary>
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponseDto>> Login([FromBody] LoginRequestDto request)
@@ -147,9 +185,9 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "No se encontró el registro de empleado asociado" });
         }
 
-        if (employee.Status != EmployeeStatus.Active)
+        if (employee.Status == EmployeeStatus.Inactive)
         {
-            return Unauthorized(new { message = "Su cuenta de empleado no está activa" });
+            return Unauthorized(new { message = "Tu cuenta está pendiente de activación por el departamento de RRHH." });
         }
 
         // Generate JWT token
@@ -176,6 +214,7 @@ public class AuthController : ControllerBase
             new(ClaimTypes.Email, user.Email!),
             new(ClaimTypes.Name, $"{employee.FirstName} {employee.LastName}"),
             new("EmployeeId", employee.Id.ToString()),
+            new("Document", employee.Document),
             new(ClaimTypes.Role, "Employee")
         };
 

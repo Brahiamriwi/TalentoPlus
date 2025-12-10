@@ -43,6 +43,7 @@ public class EmpleadoController : ControllerBase
         var response = new EmployeeResponseDto
         {
             Id = employee.Id,
+            Document = employee.Document,
             FirstName = employee.FirstName,
             LastName = employee.LastName,
             DateOfBirth = employee.DateOfBirth,
@@ -115,6 +116,7 @@ public class EmpleadoController : ControllerBase
         var response = new EmployeeResponseDto
         {
             Id = employee.Id,
+            Document = employee.Document,
             FirstName = employee.FirstName,
             LastName = employee.LastName,
             DateOfBirth = employee.DateOfBirth,
