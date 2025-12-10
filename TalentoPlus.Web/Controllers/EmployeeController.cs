@@ -136,6 +136,29 @@ public class EmployeeController : Controller
 
         if (ModelState.IsValid)
         {
+            // Check for duplicate email
+            var allEmployees = await _employeeRepository.GetAllAsync();
+            var existingEmail = allEmployees.FirstOrDefault(e => 
+                e.Email.ToLower() == employee.Email.ToLower());
+            
+            if (existingEmail != null)
+            {
+                ModelState.AddModelError("Email", "Ya existe un empleado con este correo electrónico.");
+                await LoadDropdowns();
+                return View(employee);
+            }
+
+            // Check for duplicate document
+            var existingDocument = allEmployees.FirstOrDefault(e => 
+                e.Document == employee.Document);
+            
+            if (existingDocument != null)
+            {
+                ModelState.AddModelError("Document", "Ya existe un empleado con este documento de identidad.");
+                await LoadDropdowns();
+                return View(employee);
+            }
+
             // Ensure dates are UTC for PostgreSQL
             employee.DateOfBirth = DateTime.SpecifyKind(employee.DateOfBirth, DateTimeKind.Utc);
             employee.HireDate = DateTime.SpecifyKind(employee.HireDate, DateTimeKind.Utc);
@@ -186,6 +209,29 @@ public class EmployeeController : Controller
 
         if (ModelState.IsValid)
         {
+            // Check for duplicate email (excluding current employee)
+            var allEmployees = await _employeeRepository.GetAllAsync();
+            var existingEmail = allEmployees.FirstOrDefault(e => 
+                e.Email.ToLower() == employee.Email.ToLower() && e.Id != employee.Id);
+            
+            if (existingEmail != null)
+            {
+                ModelState.AddModelError("Email", "Ya existe otro empleado con este correo electrónico.");
+                await LoadDropdowns();
+                return View(employee);
+            }
+
+            // Check for duplicate document (excluding current employee)
+            var existingDocument = allEmployees.FirstOrDefault(e => 
+                e.Document == employee.Document && e.Id != employee.Id);
+            
+            if (existingDocument != null)
+            {
+                ModelState.AddModelError("Document", "Ya existe otro empleado con este documento de identidad.");
+                await LoadDropdowns();
+                return View(employee);
+            }
+
             // Ensure dates are UTC for PostgreSQL
             employee.DateOfBirth = DateTime.SpecifyKind(employee.DateOfBirth, DateTimeKind.Utc);
             employee.HireDate = DateTime.SpecifyKind(employee.HireDate, DateTimeKind.Utc);
