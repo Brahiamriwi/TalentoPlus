@@ -225,7 +225,7 @@ When the application starts for the first time, an admin user is automatically c
 |--------|----------|-------------|
 | `GET` | `/api/departamentos` | List all departments |
 | `GET` | `/api/departamentos/{id}` | Get department by ID |
-| `POST` | `/api/auth/register` | Register new employee |
+| `POST` | `/api/auth/register` | Request credentials (sent to employee email) |
 | `POST` | `/api/auth/login` | Login and get JWT token |
 
 ### Protected (JWT Required)
@@ -236,16 +236,35 @@ When the application starts for the first time, an admin user is automatically c
 | `GET` | `/api/empleado/me/pdf` | Download resume as PDF |
 | `PUT` | `/api/empleado/me/contact` | Update address/phone |
 
+### 🔐 Secure Authentication Flow
+
+**How employees get access:**
+
+1. Admin creates employee in Web Portal
+2. Employee calls `/api/auth/register` with their document number
+3. System validates employee exists and sends password to their registered email
+4. Employee uses email + received password to login
+
+> ⚠️ **Security**: Passwords are auto-generated and sent only to the employee's registered email. This prevents account theft.
+
 ### API Usage Example
 
-**1. Login to get token:**
+**1. Register (request credentials):**
+```bash
+curl -X POST http://localhost:5002/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"document": "1234567890"}'
+# Response: "Credentials sent to j***@example.com"
+```
+
+**2. Login with received password:**
 ```bash
 curl -X POST http://localhost:5002/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "employee@example.com", "password": "Password123*"}'
+  -d '{"email": "john@example.com", "password": "received_password"}'
 ```
 
-**2. Use token in protected requests:**
+**3. Use token in protected requests:**
 ```bash
 curl -X GET http://localhost:5002/api/empleado/me \
   -H "Authorization: Bearer {your_jwt_token}"
@@ -466,7 +485,7 @@ Al iniciar la aplicación por primera vez, se crea automáticamente un usuario a
 |--------|----------|-------------|
 | `GET` | `/api/departamentos` | Lista todos los departamentos |
 | `GET` | `/api/departamentos/{id}` | Obtiene un departamento por ID |
-| `POST` | `/api/auth/register` | Registra nuevo empleado |
+| `POST` | `/api/auth/register` | Solicita credenciales (enviadas al email del empleado) |
 | `POST` | `/api/auth/login` | Login y obtiene token JWT |
 
 ### Protegidos (Requieren JWT)
@@ -477,16 +496,35 @@ Al iniciar la aplicación por primera vez, se crea automáticamente un usuario a
 | `GET` | `/api/empleado/me/pdf` | Descarga hoja de vida en PDF |
 | `PUT` | `/api/empleado/me/contact` | Actualiza dirección/teléfono |
 
+### 🔐 Flujo de Autenticación Seguro
+
+**Cómo obtienen acceso los empleados:**
+
+1. El administrador crea el empleado en el Portal Web
+2. El empleado llama a `/api/auth/register` con su número de documento
+3. El sistema valida que el empleado existe y envía la contraseña a su correo registrado
+4. El empleado usa email + contraseña recibida para hacer login
+
+> ⚠️ **Seguridad**: Las contraseñas se generan automáticamente y se envían únicamente al correo registrado del empleado. Esto previene el robo de cuentas.
+
 ### Ejemplo de uso de la API
 
-**1. Login para obtener token:**
+**1. Registrarse (solicitar credenciales):**
+```bash
+curl -X POST http://localhost:5002/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"document": "1234567890"}'
+# Respuesta: "Credenciales enviadas a j***@example.com"
+```
+
+**2. Login con la contraseña recibida:**
 ```bash
 curl -X POST http://localhost:5002/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "empleado@example.com", "password": "Password123*"}'
+  -d '{"email": "juan@example.com", "password": "contraseña_recibida"}'
 ```
 
-**2. Usar token en peticiones protegidas:**
+**3. Usar token en peticiones protegidas:**
 ```bash
 curl -X GET http://localhost:5002/api/empleado/me \
   -H "Authorization: Bearer {tu_token_jwt}"
