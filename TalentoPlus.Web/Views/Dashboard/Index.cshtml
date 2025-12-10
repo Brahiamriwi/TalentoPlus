@@ -3,75 +3,67 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="bi bi-speedometer2 me-2"></i>Dashboard</h1>
+    <h1><i class="bi bi-lightning-charge-fill me-2"></i>Dashboard</h1>
 </div>
 
 <!-- Stats Cards -->
-<div class="row mb-4">
+<div class="row mb-4 g-4">
     <div class="col-md-3">
-        <div class="card bg-primary text-white shadow">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase mb-1">Total Empleados</h6>
-                        <h2 class="mb-0 fw-bold">@ViewBag.TotalEmployees</h2>
-                    </div>
-                    <i class="bi bi-people-fill" style="font-size: 2.5rem; opacity: 0.5;"></i>
+        <div class="stat-card bg-gradient-mixed">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-uppercase mb-2 opacity-75">Total Empleados</h6>
+                    <h2 class="mb-0 fw-bold">@ViewBag.TotalEmployees</h2>
                 </div>
+                <i class="bi bi-people-fill float-animation"></i>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card bg-success text-white shadow">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase mb-1">Activos</h6>
-                        <h2 class="mb-0 fw-bold">@ViewBag.ActiveEmployees</h2>
-                    </div>
-                    <i class="bi bi-person-check-fill" style="font-size: 2.5rem; opacity: 0.5;"></i>
+        <div class="stat-card" style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-uppercase mb-2 opacity-75">Activos</h6>
+                    <h2 class="mb-0 fw-bold">@ViewBag.ActiveEmployees</h2>
                 </div>
+                <i class="bi bi-person-check-fill float-animation"></i>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card bg-warning text-dark shadow">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase mb-1">En Vacaciones</h6>
-                        <h2 class="mb-0 fw-bold">@ViewBag.OnVacationEmployees</h2>
-                    </div>
-                    <i class="bi bi-sun-fill" style="font-size: 2.5rem; opacity: 0.5;"></i>
+        <div class="stat-card bg-gradient-secondary">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-uppercase mb-2 opacity-75">En Vacaciones</h6>
+                    <h2 class="mb-0 fw-bold">@ViewBag.OnVacationEmployees</h2>
                 </div>
+                <i class="bi bi-sun-fill float-animation"></i>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card bg-secondary text-white shadow">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase mb-1">Inactivos</h6>
-                        <h2 class="mb-0 fw-bold">@ViewBag.InactiveEmployees</h2>
-                    </div>
-                    <i class="bi bi-person-dash-fill" style="font-size: 2.5rem; opacity: 0.5;"></i>
+        <div class="stat-card" style="background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-uppercase mb-2 opacity-75">Inactivos</h6>
+                    <h2 class="mb-0 fw-bold">@ViewBag.InactiveEmployees</h2>
                 </div>
+                <i class="bi bi-person-dash-fill float-animation"></i>
             </div>
         </div>
     </div>
 </div>
 
 <!-- AI Assistant -->
-<div class="card shadow">
-    <div class="card-header bg-white">
+<div class="card shadow pulse-glow">
+    <div class="card-header bg-gradient-mixed text-white">
         <h5 class="mb-0">
-            <i class="bi bi-robot me-2 text-primary"></i>Asistente IA - Consultas en Lenguaje Natural
+            <i class="bi bi-robot me-2"></i>Asistente IA - Consultas en Lenguaje Natural
         </h5>
     </div>
     <div class="card-body">
         <p class="text-muted mb-3">
-            Pregunta lo que quieras sobre los empleados. Por ejemplo: 
+            <i class="bi bi-chat-dots me-2"></i>Pregunta lo que quieras sobre los empleados. Por ejemplo: 
             <em>"¿Cuántos empleados hay en el departamento de Tecnología?"</em>, 
             <em>"¿Cuál es el salario promedio?"</em>, 
             <em>"Lista los empleados con maestría"</em>

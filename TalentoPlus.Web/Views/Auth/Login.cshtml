@@ -12,26 +12,137 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+            background: linear-gradient(135deg, #7c3aed 0%, #f97316 50%, #ec4899 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             min-height: 100vh;
             display: flex;
             align-items: center;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        @@keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         .login-card {
-            max-width: 400px;
+            max-width: 420px;
             margin: auto;
+            width: 100%;
+            padding: 20px;
+        }
+        .card {
+            border-radius: 24px !important;
+            border: none !important;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25) !important;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95) !important;
+        }
+        .card-body {
+            padding: 3rem !important;
+        }
+        .logo-icon {
+            font-size: 4rem;
+            background: linear-gradient(135deg, #7c3aed 0%, #f97316 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: float 3s ease-in-out infinite;
+        }
+        @@keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .brand-title {
+            background: linear-gradient(135deg, #7c3aed 0%, #f97316 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            font-size: 2rem;
+        }
+        .form-control {
+            border-radius: 12px !important;
+            border: 2px solid #ede9fe !important;
+            padding: 0.9rem 1rem !important;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #7c3aed !important;
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1) !important;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #1e1b4b;
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #7c3aed 0%, #f97316 100%) !important;
+            border: none !important;
+            border-radius: 12px !important;
+            padding: 0.9rem !important;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        .btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+        }
+        .alert {
+            border-radius: 12px;
+            border: none;
+            border-left: 4px solid #ef4444;
+        }
+        .form-check-input:checked {
+            background-color: #7c3aed;
+            border-color: #7c3aed;
+        }
+        .floating-shapes {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            z-index: -1;
+        }
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: floatShape 20s infinite;
+        }
+        .shape:nth-child(1) { width: 80px; height: 80px; left: 10%; animation-delay: 0s; }
+        .shape:nth-child(2) { width: 120px; height: 120px; left: 70%; top: 20%; animation-delay: 2s; }
+        .shape:nth-child(3) { width: 60px; height: 60px; left: 30%; top: 60%; animation-delay: 4s; }
+        .shape:nth-child(4) { width: 100px; height: 100px; right: 10%; top: 70%; animation-delay: 6s; }
+        @@keyframes floatShape {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.5; }
+            50% { transform: translateY(-30px) rotate(180deg); opacity: 0.8; }
         }
     </style>
 </head>
 <body>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    
     <div class="container">
         <div class="login-card">
-            <div class="card shadow-lg border-0">
-                <div class="card-body p-5">
+            <div class="card">
+                <div class="card-body">
                     <div class="text-center mb-4">
-                        <i class="bi bi-people-fill text-primary" style="font-size: 3rem;"></i>
-                        <h2 class="mt-2 fw-bold text-primary">TalentoPlus</h2>
+                        <i class="bi bi-rocket-takeoff logo-icon"></i>
+                        <h2 class="mt-3 brand-title">TalentoPlus</h2>
                         <p class="text-muted">Sistema de Gestión de Empleados</p>
                     </div>
 
@@ -48,30 +159,30 @@
                     <form method="post" asp-action="Login">
                         <div class="mb-3">
                             <label for="email" class="form-label">
-                                <i class="bi bi-envelope me-1"></i>Correo electrónico
+                                <i class="bi bi-envelope-fill me-1"></i>Correo electrónico
                             </label>
                             <input type="email" class="form-control form-control-lg" id="email" name="email" 
                                    placeholder="admin@talentoplus.com" required autofocus />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label for="password" class="form-label">
-                                <i class="bi bi-lock me-1"></i>Contraseña
+                                <i class="bi bi-lock-fill me-1"></i>Contraseña
                             </label>
                             <input type="password" class="form-control form-control-lg" id="password" name="password" 
                                    placeholder="••••••••" required />
                         </div>
-                        <div class="mb-3 form-check">
+                        <div class="mb-4 form-check">
                             <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe" value="true" />
                             <label class="form-check-label" for="rememberMe">Recordarme</label>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <button type="submit" class="btn btn-primary btn-login btn-lg w-100">
                             <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
                         </button>
                     </form>
                 </div>
             </div>
-            <p class="text-center text-white mt-3">
-                <small>&copy; 2025 TalentoPlus - RRHH</small>
+            <p class="text-center text-white mt-4">
+                <small><i class="bi bi-shield-check me-1"></i>&copy; 2025 TalentoPlus - RRHH</small>
             </p>
         </div>
     </div>
