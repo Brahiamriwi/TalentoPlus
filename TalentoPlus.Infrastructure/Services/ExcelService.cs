@@ -78,7 +78,7 @@ public class ExcelService : IExcelService
 
                 var employee = new Employee
                 {
-                    // Column 1 = Documento (not mapped - no field in Employee entity)
+                    Document = worksheet.Cells[row, 1].Text?.Trim() ?? string.Empty,       // Documento
                     FirstName = worksheet.Cells[row, 2].Text?.Trim() ?? string.Empty,      // Nombres
                     LastName = worksheet.Cells[row, 3].Text?.Trim() ?? string.Empty,       // Apellidos
                     DateOfBirth = ParseDate(worksheet.Cells[row, 4].Text),                 // FechaNacimiento
