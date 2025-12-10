@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using TalentoPlus.Core.DTOs;
+using TalentoPlus.Core.Entities;
 using TalentoPlus.Infrastructure.Data;
 
 namespace TalentoPlus.Tests.IntegrationTests;
@@ -18,29 +19,44 @@ public class DepartmentsControllerTests : IClassFixture<CustomWebApplicationFact
     }
 
     [Fact]
-    public async Task GetDepartments_ShouldReturn200OK()
+    public async Task GetDepartments_Returns200OK()
     {
-        // Act
         var response = await _client.GetAsync("/api/departamentos");
 
-        // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
-    public async Task GetDepartments_ShouldReturnListOfDepartments()
+    public async Task GetDepartments_ReturnsListOfDepartments()
     {
-        // Act
         var response = await _client.GetAsync("/api/departamentos");
         var departments = await response.Content.ReadFromJsonAsync<List<DepartmentResponseDto>>();
 
-        // Assert
         Assert.NotNull(departments);
         Assert.NotEmpty(departments);
         Assert.True(departments.Count >= 3);
         Assert.Contains(departments, d => d.Name == "Recursos Humanos");
         Assert.Contains(departments, d => d.Name == "Tecnología");
         Assert.Contains(departments, d => d.Name == "Finanzas");
+    }
+
+    [Fact]
+    public async Task GetDepartmentById_WithValidId_ReturnsDepartment()
+    {
+        var response = await _client.GetAsync("/api/departamentos/1");
+        
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var department = await response.Content.ReadFromJsonAsync<DepartmentResponseDto>();
+        Assert.NotNull(department);
+        Assert.Equal(1, department.Id);
+    }
+
+    [Fact]
+    public async Task GetDepartmentById_WithInvalidId_ReturnsNotFound()
+    {
+        var response = await _client.GetAsync("/api/departamentos/999");
+        
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }
 
@@ -50,34 +66,28 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         builder.ConfigureServices(services =>
         {
-            // Remove existing DbContext registration
             var descriptor = services.SingleOrDefault(
                 d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
 
             if (descriptor != null)
-            {
                 services.Remove(descriptor);
-            }
 
-            // Add in-memory database for testing
             services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseInMemoryDatabase("TestDb_Integration");
             });
 
-            // Build service provider and seed data
             var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             db.Database.EnsureCreated();
 
-            // Seed departments
             if (!db.Departments.Any())
             {
                 db.Departments.AddRange(
-                    new Core.Entities.Department { Name = "Recursos Humanos" },
-                    new Core.Entities.Department { Name = "Tecnología" },
-                    new Core.Entities.Department { Name = "Finanzas" }
+                    new Department { Name = "Recursos Humanos" },
+                    new Department { Name = "Tecnología" },
+                    new Department { Name = "Finanzas" }
                 );
                 db.SaveChanges();
             }
