@@ -15,9 +15,6 @@ public class DepartamentosController : ControllerBase
         _departmentRepository = departmentRepository;
     }
 
-    /// <summary>
-    /// Obtiene la lista de todos los departamentos (público)
-    /// </summary>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<DepartmentResponseDto>>> GetAll()
     {
@@ -33,9 +30,6 @@ public class DepartamentosController : ControllerBase
         return Ok(response);
     }
 
-    /// <summary>
-    /// Obtiene un departamento por su ID (público)
-    /// </summary>
     [HttpGet("{id}")]
     public async Task<ActionResult<DepartmentResponseDto>> GetById(int id)
     {

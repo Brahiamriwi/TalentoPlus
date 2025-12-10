@@ -22,9 +22,6 @@ public class EmpleadoController : ControllerBase
         _pdfService = pdfService;
     }
 
-    /// <summary>
-    /// Obtiene la información del empleado autenticado
-    /// </summary>
     [HttpGet("me")]
     public async Task<ActionResult<EmployeeResponseDto>> GetMyInfo()
     {
@@ -62,9 +59,6 @@ public class EmpleadoController : ControllerBase
         return Ok(response);
     }
 
-    /// <summary>
-    /// Descarga la hoja de vida del empleado autenticado en formato PDF
-    /// </summary>
     [HttpGet("me/pdf")]
     public async Task<IActionResult> DownloadMyResume()
     {
@@ -86,9 +80,6 @@ public class EmpleadoController : ControllerBase
         return File(pdfBytes, "application/pdf", fileName);
     }
 
-    /// <summary>
-    /// Actualiza la información de contacto del empleado autenticado
-    /// </summary>
     [HttpPut("me/contact")]
     public async Task<ActionResult<EmployeeResponseDto>> UpdateMyContact([FromBody] UpdateContactDto request)
     {
